@@ -1,38 +1,49 @@
-# sv
+# Friendship Quiz
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A quiz app that matches people based on their answers for BNSS Student Gov. 
 
-## Creating a project
+## Stack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- SvelteKit
+- Tailwind v4
+- Supabase
+- Google Gemini API (for input matching logic)
+- Resend (emails)
 
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Setup
 
 ```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm install
 ```
 
-## Building
+Create a `.env` file with your keys:
 
-To create a production version of your app:
+```
+PUBLIC_SUPABASE_URL=...
+PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+RESEND_API_KEY=...
+RESEND_FROM_EMAIL=...
+GEMINI_API_KEY=...
+PUBLIC_BASE_URL=...
+```
+
+## Dev
 
 ```sh
-npm run build
+pnpm dev
 ```
 
-You can preview the production build with `npm run preview`.
+## build
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+pnpm build
+pnpm preview
+```
+
+## how it works
+
+1. user takes quiz
+2. answers get stored in supabase (json)
+3. matching logic + ai for custom input figures out compatibility
+4. results emailed out
