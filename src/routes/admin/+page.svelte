@@ -15,7 +15,58 @@
 	let selectedMatch = $state<any | null>(null);
 	let selectedForMatch = $state<string[]>([]);
 	let isCreatingMatch = $state(false);
-	let activeTab = $state<'submissions' | 'matches'>('submissions');
+	let activeTab = $state<'submissions' | 'matches' | 'analytics'>('submissions');
+
+// Analytics computed data
+const analyticsData = $derived(() => {
+	const submissions = data.submissions;
+	const total = submissions.length;
+
+	if (total === 0) return { questions: [], total: 0 };
+
+	const questionStats = questions.map((q) => {
+		const answerCounts: Record<string, number> = {};
+		const otherAnswers: string[] = [];
+
+		// Initialize counts for predefined options
+		q.options.forEach((opt) => {
+			answerCounts[opt] = 0;
+		});
+
+		// Count answers
+		submissions.forEach((sub: any) => {
+			const answer = sub.answers?.[q.id];
+			if (!answer) return;
+
+			if (q.options.includes(answer)) {
+				answerCounts[answer]++;
+			} else {
+				// It's an "Other" answer
+				otherAnswers.push(answer);
+				answerCounts['Other'] = (answerCounts['Other'] || 0) + 1;
+			}
+		});
+
+		// Convert to sorted array with percentages
+		const distribution = Object.entries(answerCounts)
+			.map(([option, count]) => ({
+				option,
+				count,
+				percentage: total > 0 ? Math.round((count / total) * 100) : 0
+			}))
+			.sort((a, b) => b.count - a.count);
+
+		return {
+			id: q.id,
+			text: q.text,
+			distribution,
+			otherAnswers: [...new Set(otherAnswers)], // unique other answers
+			totalResponses: submissions.filter((s: any) => s.answers?.[q.id]).length
+		};
+	});
+
+	return { questions: questionStats, total };
+});
 
 	async function runMatching() {
 		isMatching = true;
@@ -214,6 +265,14 @@
 			>
 				Matches
 			</button>
+			<button
+				onclick={() => (activeTab = 'analytics')}
+				class="px-4 py-2 text-sm font-medium transition-colors {activeTab === 'analytics'
+					? 'bg-ink text-cream'
+					: 'text-ink/60 hover:text-ink'}"
+			>
+				Analytics
+			</button>
 		</div>
 
 		<div class="flex gap-3">
@@ -333,7 +392,7 @@
 				</div>
 			{/if}
 		</div>
-	{:else}
+	{:else if activeTab === 'matches'}
 		<div class="bg-white border border-ink/5">
 			{#if data.matches.length === 0}
 				<div class="p-12 text-center text-ink/40">No matches yet</div>
@@ -394,6 +453,101 @@
 						</div>
 					{/each}
 				</div>
+			{/if}
+		</div>
+	{:else if activeTab === 'analytics'}
+		{@const stats = analyticsData()}
+		<div class="space-y-6">
+			{#if stats.total === 0}
+				<div class="bg-white border border-ink/5 p-12 text-center text-ink/40">
+					No submissions yet to analyze
+				</div>
+			{:else}
+				<!-- Summary header -->
+				<div class="bg-surface border border-ink/5 p-5">
+					<div class="flex items-center gap-3">
+						<svg class="w-5 h-5 text-ink/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+						</svg>
+						<div>
+							<p class="text-[10px] font-medium tracking-widest text-ink/40 uppercase">Response Analytics</p>
+							<p class="text-sm text-ink/60 mt-0.5">
+								Based on <span class="font-serif text-ink">{stats.total}</span> submission{stats.total !== 1 ? 's' : ''}
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Questions -->
+				{#each stats.questions as q, index (q.id)}
+					<div class="bg-white border border-ink/5 overflow-hidden">
+						<!-- Question header -->
+						<div class="px-6 py-4 border-b border-ink/5 bg-ink/[0.01]">
+							<div class="flex items-start justify-between gap-4">
+								<div class="flex items-start gap-3">
+									<span class="flex-shrink-0 w-7 h-7 bg-ink text-cream font-serif text-sm flex items-center justify-center mt-0.5">
+										{index + 1}
+									</span>
+									<div>
+										<h3 class="font-serif text-lg">{q.text}</h3>
+										<p class="text-xs text-ink/40 mt-1">
+											{q.totalResponses} response{q.totalResponses !== 1 ? 's' : ''}
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Answer distribution -->
+						<div class="p-6">
+							<div class="space-y-3">
+								{#each q.distribution as item (item.option)}
+									{@const isTopAnswer = item.count > 0 && item.count === q.distribution[0].count}
+									<div class="group">
+										<div class="flex items-center justify-between mb-1.5">
+											<span class="text-sm font-medium {item.option === 'Other' ? 'text-ink/50 italic' : ''}">
+												{item.option}
+											</span>
+											<span class="text-sm tabular-nums {isTopAnswer && item.count > 0 ? 'font-semibold text-ink' : 'text-ink/50'}">
+												{item.count}
+												<span class="text-ink/30 ml-1">({item.percentage}%)</span>
+											</span>
+										</div>
+										<div class="h-8 bg-surface overflow-hidden relative">
+											<div
+												class="h-full transition-all duration-500 ease-out {isTopAnswer && item.count > 0 ? 'bg-ink' : 'bg-ink/20'}"
+												style="width: {item.percentage}%"
+											></div>
+											{#if item.percentage > 0}
+												<div class="absolute inset-y-0 left-3 flex items-center">
+													<span class="text-xs font-medium {isTopAnswer && item.percentage > 15 ? 'text-cream' : item.percentage > 15 ? 'text-ink/60' : 'text-ink/40'}">
+														{item.percentage}%
+													</span>
+												</div>
+											{/if}
+										</div>
+									</div>
+								{/each}
+							</div>
+
+							<!-- Other answers detail -->
+							{#if q.otherAnswers.length > 0}
+								<div class="mt-6 pt-4 border-t border-ink/5">
+									<p class="text-[10px] font-medium tracking-widest text-ink/40 uppercase mb-3">
+										"Other" responses
+									</p>
+									<div class="flex flex-wrap gap-2">
+										{#each q.otherAnswers as otherAnswer}
+											<span class="inline-block px-3 py-1.5 bg-surface text-sm text-ink/70 border border-ink/5">
+												{otherAnswer}
+											</span>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
+					</div>
+				{/each}
 			{/if}
 		</div>
 	{/if}
