@@ -9,6 +9,7 @@ interface SendMatchEmailParams {
 	compatibilityScore: number;
 	compatibilityTitle: string;
 	resultsUrl: string;
+	matchName?: string | null;
 	matchInstagram?: string | null;
 }
 
@@ -17,12 +18,14 @@ export async function sendMatchEmail({
 	compatibilityScore,
 	compatibilityTitle,
 	resultsUrl,
+	matchName,
 	matchInstagram
 }: SendMatchEmailParams) {
 	const html = generateMatchEmail({
 		compatibilityScore,
 		compatibilityTitle,
 		resultsUrl,
+		matchName,
 		matchInstagram
 	});
 

@@ -369,9 +369,11 @@ const analyticsData = $derived(() => {
 							{/if}
 
 							<div class="flex-1 min-w-0">
-								<p class="font-medium truncate">{submission.email}</p>
+								<p class="font-medium truncate">{submission.name || submission.email}</p>
 								<p class="text-sm text-ink/50">
-									{submission.instagram ? `@${submission.instagram}` : 'No Instagram'}
+									{submission.name ? submission.email : ''}
+									{submission.name && submission.instagram ? ' · ' : ''}
+									{submission.instagram ? `@${submission.instagram}` : submission.name ? '' : 'No Instagram'}
 									<span class="mx-2">·</span>
 									{formatDate(submission.created_at)}
 								</p>
@@ -407,8 +409,8 @@ const analyticsData = $derived(() => {
 								<div class="flex items-center gap-6">
 									<div class="flex items-center gap-3">
 										<div class="text-left">
-											<p class="font-medium">{match.person_a?.email}</p>
-											<p class="text-xs text-ink/50">{match.person_a?.instagram ? `@${match.person_a.instagram}` : ''}</p>
+											<p class="font-medium">{match.person_a?.name || match.person_a?.email}</p>
+											<p class="text-xs text-ink/50">{match.person_a?.name ? match.person_a.email : ''}{match.person_a?.instagram ? ` · @${match.person_a.instagram}` : ''}</p>
 										</div>
 
 										<div class="flex items-center gap-2 px-3">
@@ -421,8 +423,8 @@ const analyticsData = $derived(() => {
 										</div>
 
 										<div class="text-left">
-											<p class="font-medium">{match.person_b?.email}</p>
-											<p class="text-xs text-ink/50">{match.person_b?.instagram ? `@${match.person_b.instagram}` : ''}</p>
+											<p class="font-medium">{match.person_b?.name || match.person_b?.email}</p>
+											<p class="text-xs text-ink/50">{match.person_b?.name ? match.person_b.email : ''}{match.person_b?.instagram ? ` · @${match.person_b.instagram}` : ''}</p>
 										</div>
 									</div>
 								</div>
@@ -575,6 +577,11 @@ const analyticsData = $derived(() => {
 
 			<div class="p-6 space-y-6">
 				<div>
+					<p class="text-[10px] font-medium tracking-widest text-ink/40 uppercase mb-1">Name</p>
+					<p class="text-lg">{selectedSubmission.name || '-'}</p>
+				</div>
+
+				<div>
 					<p class="text-[10px] font-medium tracking-widest text-ink/40 uppercase mb-1">Email</p>
 					<p class="text-lg">{selectedSubmission.email}</p>
 				</div>
@@ -651,13 +658,15 @@ const analyticsData = $derived(() => {
 				<div class="grid grid-cols-2 gap-4 mb-6 pb-6 border-b border-ink/10">
 					<div>
 						<p class="text-[10px] font-medium tracking-widest text-ink/40 uppercase mb-1">Person A</p>
-						<p class="font-medium">{selectedMatch.person_a?.email}</p>
-						<p class="text-sm text-ink/50">{selectedMatch.person_a?.instagram ? `@${selectedMatch.person_a.instagram}` : 'No Instagram'}</p>
+						<p class="font-medium">{selectedMatch.person_a?.name || selectedMatch.person_a?.email}</p>
+						<p class="text-sm text-ink/50">{selectedMatch.person_a?.name ? selectedMatch.person_a.email : ''}</p>
+						<p class="text-sm text-ink/50">{selectedMatch.person_a?.instagram ? `@${selectedMatch.person_a.instagram}` : ''}</p>
 					</div>
 					<div>
 						<p class="text-[10px] font-medium tracking-widest text-ink/40 uppercase mb-1">Person B</p>
-						<p class="font-medium">{selectedMatch.person_b?.email}</p>
-						<p class="text-sm text-ink/50">{selectedMatch.person_b?.instagram ? `@${selectedMatch.person_b.instagram}` : 'No Instagram'}</p>
+						<p class="font-medium">{selectedMatch.person_b?.name || selectedMatch.person_b?.email}</p>
+						<p class="text-sm text-ink/50">{selectedMatch.person_b?.name ? selectedMatch.person_b.email : ''}</p>
+						<p class="text-sm text-ink/50">{selectedMatch.person_b?.instagram ? `@${selectedMatch.person_b.instagram}` : ''}</p>
 					</div>
 				</div>
 

@@ -49,23 +49,19 @@
 
 			<div class="w-full h-px bg-ink/10 my-8"></div>
 
-			{#if data.partnerInstagram}
-				<div class="bg-surface px-8 py-6 w-full">
-					<p class="text-xs font-medium tracking-widest text-ink/40 uppercase mb-2">Your Match</p>
-					<p class="text-2xl font-serif">@{data.partnerInstagram}</p>
-				</div>
-			{:else}
-				<p class="text-ink/40 text-sm">
-					Your match didn't share their Instagram. Check your email for more details.
-				</p>
-			{/if}
-
-			<!-- <a
-				href="/"
-				class="mt-8 w-full border border-ink py-4 font-medium text-center hover:bg-ink hover:text-cream transition-all active:scale-95"
-			>
-				Take the Quiz Again
-			</a> -->
+			<div class="bg-surface px-8 py-8 w-full space-y-4">
+				<p class="text-xs font-medium tracking-widest text-ink/40 uppercase">Your Match</p>
+				{#if data.partnerName}
+					<p class="text-3xl font-serif">{data.partnerName}</p>
+				{/if}
+				{#if data.partnerInstagram}
+					<p class="text-lg text-ink/50">@{data.partnerInstagram}</p>
+				{:else if !data.partnerName}
+					<p class="text-ink/40 text-sm">
+						Check your email for more details.
+					</p>
+				{/if}
+			</div>
 		</section>
 	{/if}
 </main>

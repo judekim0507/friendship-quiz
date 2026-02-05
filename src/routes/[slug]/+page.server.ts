@@ -46,6 +46,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		status: 'matched',
 		compatibilityScore: match.compatibility_score,
 		compatibilityTitle: match.compatibility_title,
+		partnerName: partner?.name || null,
 		partnerInstagram: partner?.instagram || null
 	};
 };

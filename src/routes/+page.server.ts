@@ -16,11 +16,12 @@ export const actions = {
 
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
+		const name = formData.get('name') as string;
 		const instagram = formData.get('instagram') as string | null;
 		const answersJson = formData.get('answers') as string;
 
-		if (!email || !answersJson) {
-			return fail(400, { error: 'Email and answers are required' });
+		if (!email || !name || !answersJson) {
+			return fail(400, { error: 'Email, name, and answers are required' });
 		}
 
 		let answers;
@@ -32,6 +33,7 @@ export const actions = {
 
 		const { error } = await locals.supabase.from('quiz_submissions').insert({
 			email: email.toLowerCase().trim(),
+			name: name.trim(),
 			instagram: instagram?.replace('@', '').trim() || null,
 			answers
 		});

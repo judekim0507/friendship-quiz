@@ -6,6 +6,7 @@ CREATE TABLE quiz_submissions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ DEFAULT now(),
   email TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
   instagram TEXT,
   answers JSONB NOT NULL,
   matched BOOLEAN DEFAULT false,

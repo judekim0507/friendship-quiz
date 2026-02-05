@@ -53,7 +53,7 @@
         style="width: {currentStep === 'intro' ||
         currentStep === 'already-submitted'
             ? 0
-            : currentStep === 'submitted'
+            : currentStep === 'contact' || currentStep === 'submitted'
               ? 100
               : progress}%"
     ></div>
@@ -170,6 +170,21 @@
                         type="email"
                         required
                         placeholder="you@example.com"
+                        class="w-full bg-transparent border-b border-ink/15 py-3 text-lg focus:outline-none focus:border-ink transition-colors placeholder:text-ink/25"
+                    />
+                </div>
+                <div class="space-y-2">
+                    <label
+                        for="name"
+                        class="text-xs font-medium tracking-wide text-ink/40 uppercase"
+                        >Name</label
+                    >
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        required
+                        placeholder="Your first name"
                         class="w-full bg-transparent border-b border-ink/15 py-3 text-lg focus:outline-none focus:border-ink transition-colors placeholder:text-ink/25"
                     />
                 </div>

@@ -8,6 +8,7 @@ export interface DbSubmission {
 	id: string;
 	created_at: string;
 	email: string;
+	name: string;
 	instagram: string | null;
 	answers: QuizAnswers;
 	matched: boolean;
